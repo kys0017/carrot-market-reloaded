@@ -12,7 +12,9 @@ export default function Home() {
           <span className="hidden group-focus-within:block">
             Make sure it is a valid email...
           </span>
-          <button>Submit</button>
+          <button className="rounded-my-radius h-[73px] w-full bg-[#543cb8] text-white">
+            Submit
+          </button>
         </div>
       </div>
     </main>
