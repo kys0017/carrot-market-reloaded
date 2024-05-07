@@ -1,14 +1,13 @@
+"use client";
+
 import FormBtn from "@/components/form-btn";
 import FormInput from "@/components/form-input";
 import SocialLogin from "@/components/social-login";
-import { useFormStatus } from "react-dom";
+import { useFormState } from "react-dom";
+import { onSubmit } from "./action";
 
 export default function Login() {
-  const onSubmit = async (formData: FormData) => {
-    "use server";
-    await new Promise((resolve) => setTimeout(resolve, 5000));
-    console.log("logged in!");
-  };
+  const [state, action] = useFormState(onSubmit, null);
 
   return (
     <div className="flex flex-col gap-10 px-6 py-8">
@@ -16,7 +15,7 @@ export default function Login() {
         <h1 className="text-2xl">안녕하세요!</h1>
         <h2 className="text-xl">Log in with email and password.</h2>
       </div>
-      <form action={onSubmit} className="flex flex-col gap-3">
+      <form action={action} className="flex flex-col gap-3">
         <FormInput
           name="email"
           type="email"
@@ -29,7 +28,7 @@ export default function Login() {
           type="password"
           placeholder="Password"
           required
-          errors={[]}
+          errors={state?.errors ?? []}
         />
         <FormBtn text="Log in" />
       </form>
