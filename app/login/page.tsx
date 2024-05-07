@@ -1,12 +1,13 @@
 import FormBtn from "@/components/form-btn";
 import FormInput from "@/components/form-input";
 import SocialLogin from "@/components/social-login";
+import { useFormStatus } from "react-dom";
 
 export default function Login() {
   const onSubmit = async (formData: FormData) => {
     "use server";
-    console.log(formData.get("email"), formData.get("password"));
-    console.log("i run in the server baby!");
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+    console.log("logged in!");
   };
 
   return (
@@ -30,7 +31,7 @@ export default function Login() {
           required
           errors={[]}
         />
-        <FormBtn loading={false} text="Log in" />
+        <FormBtn text="Log in" />
       </form>
       <SocialLogin />
     </div>
