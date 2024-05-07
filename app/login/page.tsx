@@ -4,7 +4,7 @@ import FormBtn from "@/components/form-btn";
 import FormInput from "@/components/form-input";
 import SocialLogin from "@/components/social-login";
 import { useFormState } from "react-dom";
-import { onSubmit } from "./action";
+import { onSubmit } from "./actions";
 
 export default function Login() {
   const [state, action] = useFormState(onSubmit, null);
