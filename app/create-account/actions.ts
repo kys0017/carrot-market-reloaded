@@ -1,6 +1,10 @@
 "use server";
 import { z } from "zod";
 
+const passwordRegex = new RegExp(
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*?[#?!@$%^&*-]).+$/,
+);
+
 const checkUsername = (username: string) => !username.includes("potato");
 
 const checkPasswords = ({
@@ -20,12 +24,19 @@ const formSchema = z
       })
       .min(3, "Way too short!!!")
       .max(10, "That is too loooooong!")
+      .toLowerCase()
+      .trim()
+      .transform((username) => `🔥 ${username} 🔥`)
       .refine(checkUsername, "no potatoes allowed"),
-    email: z.string().email(),
-    password: z.string().min(10),
-    confirm_password: z.string().min(10),
+    email: z.string().email().toLowerCase(),
+    password: z
+      .string()
+      .regex(
+        passwordRegex,
+        "Password must have lowercase, UPPERCASE, a number and special characters ",
+      ),
+    confirm_password: z.string(),
   })
-  // .refine(checkPasswords, "Both passwords should be the same!");
   .refine(checkPasswords, {
     message: "Both passwords should be the same!",
     path: ["confirm_password"],
@@ -47,7 +58,8 @@ export async function createAccount(prevState: any, formData: FormData) {
   const result = formSchema.safeParse(data);
   if (!result.success) {
     // flatten() - error 객체에서 필요한 것만 표시해 줌.
-    console.log(result.error.flatten());
     return result.error.flatten();
+  } else {
+    console.log(result.data);
   }
 }
