@@ -90,8 +90,6 @@ export async function createAccount(prevState: any, formData: FormData) {
     // flatten() - error 객체에서 필요한 것만 표시해 줌.
     return result.error.flatten();
   } else {
-    // check if username is taken
-    // check if the email is already used
     // hash password
     // save the user to db
     // log the user in
