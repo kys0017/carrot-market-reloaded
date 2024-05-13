@@ -1,3 +1,3 @@
 # Carrot Market Reloaded
 
-🚀 [page](https://carrot-market-reloaded-phi.vercel.app/login)
+🚀 [page](https://carrot-market-reloaded-phi.vercel.app)
