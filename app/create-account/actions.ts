@@ -18,29 +18,39 @@ const checkPasswords = ({
 }) => password === confirm_password;
 
 const checkUniqueUsername = async (username: string) => {
-  const user = await db.user.findUnique({
-    where: {
-      username,
-    },
-    select: {
-      id: true,
-    },
-  });
+  try {
+    const user = await db.user.findUnique({
+      where: {
+        username,
+      },
+      select: {
+        id: true,
+      },
+    });
 
-  return !Boolean(user);
+    return !Boolean(user);
+  } catch (error) {
+    console.log(error);
+    throw Error("Error occured checking username");
+  }
 };
 
 const checkUniqueEmail = async (email: string) => {
-  const user = await db.user.findUnique({
-    where: {
-      email,
-    },
-    select: {
-      id: true,
-    },
-  });
+  try {
+    const user = await db.user.findUnique({
+      where: {
+        email,
+      },
+      select: {
+        id: true,
+      },
+    });
 
-  return !Boolean(user);
+    return !Boolean(user);
+  } catch (error) {
+    console.log(error);
+    throw Error("Error occured cheking email");
+  }
 };
 
 const formSchema = z
