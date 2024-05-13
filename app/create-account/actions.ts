@@ -30,8 +30,7 @@ const checkUniqueUsername = async (username: string) => {
 
     return !Boolean(user);
   } catch (error) {
-    console.log(error);
-    throw Error("Error occured checking username");
+    throw Error("Prisma error occured checking username");
   }
 };
 
@@ -48,8 +47,7 @@ const checkUniqueEmail = async (email: string) => {
 
     return !Boolean(user);
   } catch (error) {
-    console.log(error);
-    throw Error("Error occured cheking email");
+    throw Error("Prisma Error occured cheking email");
   }
 };
 
@@ -106,9 +104,10 @@ export async function createAccount(prevState: any, formData: FormData) {
       // log the user in
       // redirect '/home'
     }
-  } catch (error) {
+  } catch (error: any) {
     return {
-      formErrors: ["Error occured"],
+      fieldErrors: [],
+      formErrors: [error?.message || "Error occured"],
     } as z.typeToFlattenedError<
       {
         username: string;
