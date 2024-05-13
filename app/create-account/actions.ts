@@ -85,14 +85,28 @@ export async function createAccount(prevState: any, formData: FormData) {
    * parse -> throw error. So, try catch 로 잡아야 함.
    * safeParse -> not throw error. return validation result.
    */
-  const result = await formSchema.safeParseAsync(data);
-  if (!result.success) {
-    // flatten() - error 객체에서 필요한 것만 표시해 줌.
-    return result.error.flatten();
-  } else {
-    // hash password
-    // save the user to db
-    // log the user in
-    // redirect '/home'
+  try {
+    const result = await formSchema.safeParseAsync(data);
+    if (!result.success) {
+      // flatten() - error 객체에서 필요한 것만 표시해 줌.
+      return result.error.flatten();
+    } else {
+      // hash password
+      // save the user to db
+      // log the user in
+      // redirect '/home'
+    }
+  } catch (error) {
+    return {
+      formErrors: ["Error occured"],
+    } as z.typeToFlattenedError<
+      {
+        username: string;
+        email: string;
+        password: string;
+        confirm_password: string;
+      },
+      string
+    >;
   }
 }

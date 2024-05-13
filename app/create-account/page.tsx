@@ -51,6 +51,11 @@ export default function CreateAccount() {
         />
         <Button text="Create account" />
       </form>
+      {state?.formErrors.map((error, index) => (
+        <span key={index} className="font-medium text-red-500">
+          {error}
+        </span>
+      ))}
       <SocialLogin />
     </div>
   );
