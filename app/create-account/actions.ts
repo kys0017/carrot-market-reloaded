@@ -6,6 +6,7 @@ import {
 } from "@/lib/constants";
 import db from "@/lib/db";
 import { z } from "zod";
+import bcrypt from "bcrypt";
 
 const checkUsername = (username: string) => !username.includes("potato");
 
@@ -18,37 +19,29 @@ const checkPasswords = ({
 }) => password === confirm_password;
 
 const checkUniqueUsername = async (username: string) => {
-  try {
-    const user = await db.user.findUnique({
-      where: {
-        username,
-      },
-      select: {
-        id: true,
-      },
-    });
+  const user = await db.user.findUnique({
+    where: {
+      username,
+    },
+    select: {
+      id: true,
+    },
+  });
 
-    return !Boolean(user);
-  } catch (error) {
-    throw Error("Prisma error occured checking username");
-  }
+  return !Boolean(user);
 };
 
 const checkUniqueEmail = async (email: string) => {
-  try {
-    const user = await db.user.findUnique({
-      where: {
-        email,
-      },
-      select: {
-        id: true,
-      },
-    });
+  const user = await db.user.findUnique({
+    where: {
+      email,
+    },
+    select: {
+      id: true,
+    },
+  });
 
-    return !Boolean(user);
-  } catch (error) {
-    throw Error("Prisma Error occured cheking email");
-  }
+  return !Boolean(user);
 };
 
 const formSchema = z
@@ -93,29 +86,28 @@ export async function createAccount(prevState: any, formData: FormData) {
    * parse -> throw error. So, try catch 로 잡아야 함.
    * safeParse -> not throw error. return validation result.
    */
-  try {
-    const result = await formSchema.safeParseAsync(data);
-    if (!result.success) {
-      // flatten() - error 객체에서 필요한 것만 표시해 줌.
-      return result.error.flatten();
-    } else {
-      // hash password
-      // save the user to db
-      // log the user in
-      // redirect '/home'
-    }
-  } catch (error: any) {
-    return {
-      fieldErrors: [],
-      formErrors: [error?.message || "Error occured"],
-    } as z.typeToFlattenedError<
-      {
-        username: string;
-        email: string;
-        password: string;
-        confirm_password: string;
+  const result = await formSchema.safeParseAsync(data);
+  if (!result.success) {
+    // flatten() - error 객체에서 필요한 것만 표시해 줌.
+    return result.error.flatten();
+  } else {
+    // hash password
+    // 해싱 알고리즘을 12번 실행하겠다는 뜻.
+    const hashedPassword = await bcrypt.hash(result.data.password, 12);
+
+    const user = await db.user.create({
+      data: {
+        username: result.data.username,
+        email: result.data.email,
+        password: hashedPassword,
       },
-      string
-    >;
+      select: {
+        id: true,
+      },
+    });
+
+    console.log(user);
+    // log the user in
+    // redirect '/home'
   }
 }
