@@ -84,7 +84,7 @@ export async function createAccount(prevState: any, formData: FormData) {
     confirm_password: formData.get("confirm_password"),
   };
 
-  const result = await formSchema.safeParseAsync(data);
+  const result = await formSchema.spa(data);
   if (!result.success) {
     // flatten() - error 객체에서 필요한 것만 표시해 줌.
     return result.error.flatten();
