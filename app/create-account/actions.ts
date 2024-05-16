@@ -10,6 +10,7 @@ import bcrypt from "bcrypt";
 import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import getSession from "@/lib/session";
 
 const checkUsername = (username: string) => !username.includes("potato");
 
@@ -102,17 +103,9 @@ export async function createAccount(prevState: any, formData: FormData) {
         id: true,
       },
     });
-
-    // log the user in
-    /* 쿠키 초기세팅 - 사용자에게 쿠키를 받는데, cookieName 을 가진 쿠키가 없으면 생성한다. */
-    const cookie = await getIronSession(cookies(), {
-      cookieName: "delicious-karrot",
-      password: process.env.COOKIE_PASSWORD!,
-    });
-    // 쿠키에 user id 세팅 후 쿠키 저장
-    // @ts-ignore
-    cookie.id = user.id;
-    await cookie.save();
+    const session = await getSession();
+    session.id = user.id;
+    await session.save();
 
     redirect("/profile");
   }
