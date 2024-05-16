@@ -7,6 +7,9 @@ import {
 import db from "@/lib/db";
 import { z } from "zod";
 import bcrypt from "bcrypt";
+import { getIronSession } from "iron-session";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 const checkUsername = (username: string) => !username.includes("potato");
 
@@ -81,18 +84,12 @@ export async function createAccount(prevState: any, formData: FormData) {
     confirm_password: formData.get("confirm_password"),
   };
 
-  /**
-   * 유효성 검사 실패 시
-   * parse -> throw error. So, try catch 로 잡아야 함.
-   * safeParse -> not throw error. return validation result.
-   */
   const result = await formSchema.safeParseAsync(data);
   if (!result.success) {
     // flatten() - error 객체에서 필요한 것만 표시해 줌.
     return result.error.flatten();
   } else {
     // hash password
-    // 해싱 알고리즘을 12번 실행하겠다는 뜻.
     const hashedPassword = await bcrypt.hash(result.data.password, 12);
 
     const user = await db.user.create({
@@ -106,8 +103,17 @@ export async function createAccount(prevState: any, formData: FormData) {
       },
     });
 
-    console.log(user);
     // log the user in
-    // redirect '/home'
+    /* 쿠키 초기세팅 - 사용자에게 쿠키를 받는데, cookieName 을 가진 쿠키가 없으면 생성한다. */
+    const cookie = await getIronSession(cookies(), {
+      cookieName: "delicious-karrot",
+      password: process.env.COOKIE_PASSWORD!,
+    });
+    // 쿠키에 user id 세팅 후 쿠키 저장
+    // @ts-ignore
+    cookie.id = user.id;
+    await cookie.save();
+
+    redirect("/profile");
   }
 }
