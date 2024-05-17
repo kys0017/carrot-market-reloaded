@@ -65,6 +65,7 @@ export const login = async (prevState: any, formData: FormData) => {
     if (ok) {
       const session = await getSession();
       session.id = user!.id; // user 가 존재하므로 강제.
+      await session.save();
 
       redirect("/profile");
     } else {
