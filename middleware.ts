@@ -1,7 +1,7 @@
 import { MiddlewareConfig, NextRequest } from "next/server";
 
 export async function middleware(req: NextRequest) {
-  console.log("hello");
+  console.log("hellooo");
 }
 
 export const config: MiddlewareConfig = {
