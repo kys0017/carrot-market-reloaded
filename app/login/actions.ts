@@ -1,15 +1,10 @@
 "use server";
 
-import {
-  PASSWORD_MIN_LENGTH,
-  PASSWORD_REGEX,
-  PASSWORD_REGEX_ERROR,
-} from "@/lib/constants";
 import db from "@/lib/db";
-import { z } from "zod";
+import { saveUserSession } from "@/lib/session";
 import bcyrpt from "bcrypt";
-import getSession from "@/lib/session";
 import { redirect } from "next/navigation";
+import { z } from "zod";
 
 const checkEmailExists = async (email: string) => {
   const user = await db.user.findUnique({
@@ -63,9 +58,7 @@ export const login = async (prevState: any, formData: FormData) => {
       user!.password ?? "xxxx",
     );
     if (ok) {
-      const session = await getSession();
-      session.id = user!.id; // user 가 존재하므로 강제.
-      await session.save();
+      saveUserSession(user!); // user 가 존재하므로 강제.
 
       redirect("/profile");
     } else {

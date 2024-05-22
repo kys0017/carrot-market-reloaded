@@ -1,14 +1,10 @@
 "use server";
-import {
-  PASSWORD_MIN_LENGTH,
-  PASSWORD_REGEX,
-  PASSWORD_REGEX_ERROR,
-} from "@/lib/constants";
+import { PASSWORD_MIN_LENGTH } from "@/lib/constants";
 import db from "@/lib/db";
-import { z } from "zod";
+import { saveUserSession } from "@/lib/session";
 import bcrypt from "bcrypt";
 import { redirect } from "next/navigation";
-import getSession from "@/lib/session";
+import { z } from "zod";
 
 const checkUsername = (username: string) => !username.includes("potato");
 
@@ -110,9 +106,8 @@ export async function createAccount(prevState: any, formData: FormData) {
         id: true,
       },
     });
-    const session = await getSession();
-    session.id = user.id;
-    await session.save();
+
+    saveUserSession(user);
 
     redirect("/profile");
   }

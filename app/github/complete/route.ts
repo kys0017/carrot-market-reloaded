@@ -1,12 +1,14 @@
 import db from "@/lib/db";
-import getSession from "@/lib/session";
-import { notFound, redirect } from "next/navigation";
+import { saveUserSession } from "@/lib/session";
+import { redirect } from "next/navigation";
 import { NextRequest } from "next/server";
 
 export async function GET(req: NextRequest) {
   const code = req.nextUrl.searchParams.get("code");
   if (!code) {
-    return notFound();
+    return new Response(null, {
+      status: 400,
+    });
   }
 
   const accessTokenParams = new URLSearchParams({
@@ -47,19 +49,28 @@ export async function GET(req: NextRequest) {
     },
     select: {
       id: true,
+      username: true,
     },
   });
 
   if (user) {
-    const session = await getSession();
-    session.id = user.id;
-    await session.save();
+    saveUserSession(user);
     return redirect("/profile");
   }
 
+  // username 은 unique. 동일 username 존재할 때 처리.
+  const hasAlreadyUsername = await db.user.findUnique({
+    where: {
+      username: login,
+    },
+    select: {
+      id: true,
+    },
+  });
+
   const newUser = await db.user.create({
     data: {
-      username: login,
+      username: hasAlreadyUsername ? `${login}-${id}` : login,
       github_id: id + "",
       avatar: avatar_url,
     },
@@ -68,8 +79,6 @@ export async function GET(req: NextRequest) {
     },
   });
 
-  const session = await getSession();
-  session.id = newUser.id;
-  await session.save();
+  saveUserSession(newUser);
   return redirect("/profile");
 }
