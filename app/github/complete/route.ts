@@ -22,6 +22,8 @@ export async function GET(req: NextRequest) {
 
   const { id, avatar_url, login } = await getGitHubUserProfile(access_token);
 
+  console.log({ id, avatar_url, login });
+
   const user = await db.user.findUnique({
     where: {
       github_id: id + "",
@@ -33,7 +35,7 @@ export async function GET(req: NextRequest) {
   });
 
   if (user) {
-    saveUserSession(user!);
+    await saveUserSession(user!);
     return redirect("/profile");
   }
 
@@ -58,6 +60,6 @@ export async function GET(req: NextRequest) {
     },
   });
 
-  saveUserSession(newUser);
+  await saveUserSession(newUser);
   return redirect("/profile");
 }
