@@ -5,6 +5,7 @@ import { z } from "zod";
 import validator from "validator";
 import { redirect } from "next/navigation";
 import db from "@/lib/db";
+import { saveUserSession } from "@/lib/session";
 
 const phoneSchema = z
   .string()
@@ -14,7 +15,25 @@ const phoneSchema = z
     "Wrong phone format",
   );
 
-const tokenSchema = z.coerce.number().min(100000).max(999999);
+async function tokenExists(token: number) {
+  const exists = await db.sMSToken.findUnique({
+    where: {
+      token: token.toString(),
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  return Boolean(exists);
+}
+
+// 입력받은 값을 number 로 변환. refind check 함수 인자는 number type 이 된다.
+const tokenSchema = z.coerce
+  .number()
+  .min(100000)
+  .max(999999)
+  .refine(tokenExists, "This token does not exist.");
 
 interface ActionState {
   token: boolean;
@@ -83,14 +102,31 @@ export async function smsLogin(prevState: ActionState, formData: FormData) {
       };
     }
   } else {
-    const result = tokenSchema.safeParse(token);
+    const result = await tokenSchema.spa(token);
     if (!result.success) {
       return {
         token: true,
         errors: result.error.flatten(),
       };
     } else {
-      redirect("/");
+      const token = await db.sMSToken.findUnique({
+        where: {
+          token: result.data.toString(),
+        },
+        select: {
+          id: true,
+          userId: true,
+        },
+      });
+      // token 유효성 체크를 마쳤으므로 typescript 강제.
+      await saveUserSession({ id: token!.userId });
+      await db.sMSToken.delete({
+        where: {
+          id: token!.id,
+        },
+      });
+
+      redirect("/profile");
     }
   }
 }
