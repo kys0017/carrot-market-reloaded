@@ -1,5 +1,6 @@
 "use server";
 
+import twilio from "twilio";
 import crypto from "crypto";
 import { z } from "zod";
 import validator from "validator";
@@ -97,6 +98,17 @@ export async function smsLogin(prevState: ActionState, formData: FormData) {
         },
       });
       // send token using twilio
+      const client = twilio(
+        process.env.TWILIO_ACCOUNT_SID,
+        process.env.TWILIO_AUTH_TOKEN,
+      );
+      await client.messages.create({
+        body: `Your Karrot verification code is ${token}`,
+        from: process.env.TWILIO_PHONE_NUMBER,
+        // to: result.data // 입력받은 phone number 를 넣어주는 게 맞지만,
+        // twilio trial 을 사용하고 있으므로 체험판 계정 인증 시 사용한 번호를 넣어줌.
+        to: process.env.MY_PHONE_NUMBER!,
+      });
       return {
         token: true,
       };
