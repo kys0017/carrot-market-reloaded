@@ -4,7 +4,7 @@ import { formatToWon } from "@/lib/utils";
 import { UserIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 async function getIsOwner(userId: number) {
   const session = await getSession();
@@ -19,6 +19,7 @@ async function getProduct(id: number) {
   const product = await db.product.findUnique({
     where: {
       id,
+      deleted_at: null,
     },
     include: {
       user: {
@@ -47,6 +48,21 @@ export default async function ProductDetail({
   if (!product) {
     return notFound();
   }
+
+  const deleteProduct = async () => {
+    "use server";
+    console.log("product id : ", product.id);
+    await db.product.update({
+      data: {
+        deleted_at: new Date(),
+      },
+      where: {
+        id: product.id,
+      },
+    });
+
+    redirect("/products");
+  };
 
   const isOwner = await getIsOwner(product.userId);
   return (
@@ -80,9 +96,11 @@ export default async function ProductDetail({
           {formatToWon(product.price)}원
         </span>
         {isOwner && (
-          <button className="rounded-md bg-red-500 px-5 py-2.5 font-semibold text-white">
-            Delete product
-          </button>
+          <form action={deleteProduct}>
+            <button className="rounded-md bg-red-500 px-5 py-2.5 font-semibold text-white">
+              Delete product
+            </button>
+          </form>
         )}
         <Link
           className="rounded-md bg-orange-500 px-5 py-2.5 font-semibold text-white"

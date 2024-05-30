@@ -3,6 +3,9 @@ import db from "@/lib/db";
 
 async function getProducts() {
   const products = await db.product.findMany({
+    where: {
+      deleted_at: null,
+    },
     select: {
       title: true,
       price: true,
