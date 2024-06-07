@@ -4,13 +4,14 @@ import Button from "@/components/button";
 import Input from "@/components/input";
 import { PhotoIcon } from "@heroicons/react/24/solid";
 import { useEffect, useState } from "react";
-import uploadProduct from "./actions";
+import uploadProduct, { getUploadUrl } from "./actions";
 import { useFormState } from "react-dom";
 
 export default function AddProduct() {
   const [state, action] = useFormState(uploadProduct, null);
+  const [uploadUrl, setUploadUrl] = useState("");
   const [preview, setPreview] = useState("");
-  const onImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const {
       target: { files },
     } = event;
@@ -20,6 +21,12 @@ export default function AddProduct() {
     const file = files[0];
     const url = URL.createObjectURL(file);
     setPreview(url);
+
+    const { success, result } = await getUploadUrl();
+    if (success) {
+      const { id, uploadURL } = result;
+      setUploadUrl(uploadURL);
+    }
   };
 
   useEffect(() => {
