@@ -1,6 +1,7 @@
 import { formatToTimeAgo, formatToWon } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 
 interface ListProductProps {
   title: string;
@@ -17,10 +18,18 @@ export default function ListProduct({
   photo,
   id,
 }: ListProductProps) {
+  const [variant, setVariant] = useState("avatar");
+
   return (
     <Link href={`/products/${id}`} className="flex gap-5">
       <div className="relative size-28 overflow-hidden rounded-md">
-        <Image fill src={photo} className="object-cover" alt={title} />
+        <Image
+          fill
+          src={`${photo}/${variant}`}
+          onError={() => setVariant("public")}
+          className="object-cover"
+          alt={title}
+        />
       </div>
       <div className="flex flex-col gap-1 *:text-white">
         <span className="text-lg">{title}</span>
