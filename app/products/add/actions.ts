@@ -1,30 +1,11 @@
 "use server";
 
-import { z } from "zod";
-import fs from "fs/promises";
 import db from "@/lib/db";
 import getSession from "@/lib/session";
 import { redirect } from "next/navigation";
+import { productSchema } from "./schema";
 
-const productSchema = z.object({
-  photo: z
-    .string({
-      required_error: "Photo is required",
-      invalid_type_error: "Photo must be image format",
-    })
-    .min(1, "Photo is required"),
-  title: z.string({
-    required_error: "Title is required",
-  }),
-  description: z.string({
-    required_error: "Decription is required",
-  }),
-  price: z.coerce.number({
-    required_error: "Price is required",
-  }),
-});
-
-export default async function uploadProduct(_: any, formData: FormData) {
+export default async function uploadProduct(formData: FormData) {
   const data = {
     photo: formData.get("photo"),
     title: formData.get("title"),
