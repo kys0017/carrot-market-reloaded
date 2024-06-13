@@ -7,7 +7,7 @@ import { unstable_cache as nextCache } from "next/cache";
 import Link from "next/link";
 
 const getCachedProducts = nextCache(getInitialProducts, ["home-products"], {
-  revalidate: 30,
+  revalidate: 35,
 });
 
 async function getInitialProducts() {
