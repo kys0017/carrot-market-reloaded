@@ -38,6 +38,10 @@ export const metadata = {
   title: "Home",
 };
 
+// next.js 가 자동으로 찾음. or not set to default value
+// export const dynamic = "force-dynamic";
+export const revalidate = 60;
+
 export default async function Products() {
   const initialProducts = await getInitialProducts();
 
