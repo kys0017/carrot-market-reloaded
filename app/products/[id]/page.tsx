@@ -17,6 +17,13 @@ async function getIsOwner(userId: number) {
 }
 
 async function getProduct(id: number) {
+  // fetch("https://api.com", {
+  //   next: {
+  //     revalidate: 60,
+  //     tags: ["hello"],
+  //   },
+  // });
+
   console.log("product");
   const product = await db.product.findUnique({
     where: {
