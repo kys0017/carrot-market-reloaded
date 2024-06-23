@@ -8,7 +8,7 @@ CREATE TABLE "ChatRoom" (
 -- CreateTable
 CREATE TABLE "Message" (
     "id" TEXT NOT NULL PRIMARY KEY,
-    "paylaod" TEXT NOT NULL,
+    "payload" TEXT NOT NULL,
     "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" DATETIME,
     "chatRoomId" TEXT NOT NULL,
