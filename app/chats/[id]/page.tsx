@@ -59,12 +59,33 @@ export default async function ChatRoom({ params }: { params: { id: string } }) {
     return notFound();
   }
 
+  async function getUserProfile() {
+    const session = await getSession();
+    const user = await db.user.findUnique({
+      where: {
+        id: session.id!,
+      },
+      select: {
+        username: true,
+        avatar: true,
+      },
+    });
+
+    return user;
+  }
+
   const initialMessages = await getMessages(params.id);
   const session = await getSession();
+  const user = await getUserProfile();
+  if (!user) {
+    return notFound();
+  }
   return (
     <ChatMessagesList
       chatRoomId={params.id}
       userId={session.id!}
+      username={user.username}
+      avatar={user.avatar!}
       initialMessages={initialMessages}
     />
   );
